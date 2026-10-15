@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "URLguard — キリル文字ドメインをブロック",
+  "version": "1.0.0",
+  "minimum_chrome_version": "103",
+  "description": "キリル文字を含むドメインへのページ移動を通信前に止めます。",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx+eIWsp9FiTfEwzM6iV3C1/KFMA1HlqQCGZh9Ud4uhuEFhrlerJPoCSxSqptl6IEiZ0bRE6yamE6ZCZ1YWH0Dx/Lc0cq8Iu5fFCd5fj0oJNSHzeEy9W+O8Ot1KtoQM5r9euX1+RwH6c7YUj0hWMDTJDxmtJyi8XKp+LEskcXQXpBMHNNo5IJdXqz7BSZ47H5/nq9hFerThiDi/LWN3do0phThu0aHBBRF7plr761Nu+17YPzIMms+OBN0r2LwDuW0ER+NX9GjFCxkTEhs4Z2OjPFgihh4uUi8Qj4e6nuArK2/B2swFSOXQzCpBMKMDTsvrLd3Qp73YANFDr0Zh33CQIDAQAB",
+  "permissions": [
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "idn_gate",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "gate.html"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ]
+}

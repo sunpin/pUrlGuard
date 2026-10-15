@@ -1,0 +1,10 @@
+import { generateKeyPairSync, createHash } from 'node:crypto';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+const keyPath = new URL('../extension/manifest.json', import.meta.url);
+mkdirSync(new URL('../extension/', import.meta.url), { recursive: true });
+const key = existsSync(keyPath) ? JSON.parse(readFileSync(keyPath)).key : generateKeyPairSync('rsa', { modulusLength: 2048 }).publicKey.export({ type: 'spki', format: 'der' }).toString('base64');
+const id = [...createHash('sha256').update(Buffer.from(key, 'base64')).digest().subarray(0,16)].map(b => String.fromCharCode(97+(b>>4),97+(b&15))).join('');
+const manifest = { manifest_version: 3, name: 'URLguard — キリル文字ドメインをブロック', version: '1.0.0', minimum_chrome_version: '103', description: 'キリル文字を含むドメインへのページ移動を通信前に止めます。', key, permissions: ['declarativeNetRequest'], host_permissions: ['http://*/*','https://*/*'], background: { service_worker: 'background.js', type: 'module' }, declarative_net_request: { rule_resources: [{ id: 'idn_gate', enabled: true, path: 'rules.json' }] }, web_accessible_resources: [{ resources: ['gate.html'], matches: ['http://*/*','https://*/*'] }] };
+writeFileSync(keyPath, JSON.stringify(manifest,null,2)+'\n');
+writeFileSync(new URL('../extension/rules.json', import.meta.url), JSON.stringify([{ id: 1, priority: 1, action: { type: 'redirect', redirect: { regexSubstitution: `chrome-extension://${id}/gate.html#\\0` } }, condition: { regexFilter: '^https?://([^/]*@)?([^/@:]+\\.)*xn--[^/@:]+(:[0-9]+)?/.*', resourceTypes: ['main_frame'] } }],null,2)+'\n');
+console.log(`Built extension: ${id}`);
